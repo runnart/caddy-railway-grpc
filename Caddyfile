@@ -1,3 +1,13 @@
+{
+
+debug
+http_port {$PORT}
+
+servers {
+		protocols h1 h2 h2c
+	}
+}
+
 :{$PORT} {
 	reverse_proxy h2c://{$SERVICE_URL}
 }
