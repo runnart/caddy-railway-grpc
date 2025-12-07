@@ -1,13 +1,22 @@
 {
+  debug
+  http_port {$PORT}
+  https_port {$TLS_PORT}
 
-debug
-http_port {$PORT}
-
-servers {
-		protocols h1 h2 h2c
-	}
+  servers {
+    protocols h1 h2 h2c
+  }
 }
 
 :{$PORT} {
-	reverse_proxy h2c://{$SERVICE_URL}
+    reverse_proxy {
+      to {$SERVICE_URL}
+      transport http {
+          versions h1 h2c
+      }
+    }
+}
+
+:{$TLS_PORT} {
+    reverse_proxy h2c://{$SERVICE_URL}
 }
