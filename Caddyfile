@@ -1,22 +1,21 @@
 {
   debug
-  http_port {$PORT}
-  https_port {$TLS_PORT}
 
+  # Railway provides this env var
+  http_port {$PORT}
+
+  # Only HTTP/2 (h2c) on the backend; incoming will be h2/h2c automatically.
   servers {
-    protocols h1 h2 h2c
+    protocols h2 h2c
   }
 }
 
+# Accept gRPC on $PORT and proxy to your gRPC backend
 :{$PORT} {
-    reverse_proxy {
-      to {$SERVICE_URL}
-      transport http {
-          versions 1.1 h2c
-      }
+  reverse_proxy {$SERVICE_URL} {
+    transport http {
+      # gRPC backend is h2c (HTTP/2 cleartext)
+      versions h2c
     }
-}
-
-:{$TLS_PORT} {
-    reverse_proxy h2c://{$SERVICE_URL}
+  }
 }
